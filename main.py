@@ -1,58 +1,117 @@
 from pathlib import Path
 import shutil
 
-folder_input = input("Enter folder path to organize: ")
-folder_path = Path(folder_input)
-
-file_categories = {
-    "Images": [".jpg", ".jpeg", ".png", ".gif"],
+FILE_CATEGORIES = {
+    "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp"],
     "PDFs": [".pdf"],
-    "Videos": [".mp4", ".mkv", ".avi"],
-    "Documents": [".docx", ".doc", ".txt"],
-    "Audio": [".mp3", ".wav"]
+    "Videos": [".mp4", ".mkv", ".avi", ".mov"],
+    "Documents": [".docx", ".doc", ".txt", ".pptx"],
+    "Audio": [".mp3", ".wav"],
+    "Archives": [".zip", ".rar"],
+    "Code": [".py", ".java", ".cpp", ".html", ".css", ".js"],
+    "Spreadsheets": [".csv", ".xlsx"]
 }
 
-moved_count = 0
-
-for category in file_categories.keys():
-    (folder_path / category).mkdir(exist_ok=True)
-
-(folder_path / "Others").mkdir(exist_ok=True)
+CATEGORY_NAMES = list(FILE_CATEGORIES.keys()) + ["Others"]
 
 
-def get_unique_destination(destination):
+def create_category_folders(folder_path: Path) -> None:
+    for category in CATEGORY_NAMES:
+        (folder_path / category).mkdir(exist_ok=True)
+
+
+def get_file_category(file_name: str) -> str:
+    extension = Path(file_name).suffix.lower()
+    for category, extensions in FILE_CATEGORIES.items():
+        if extension in extensions:
+            return category
+    return "Others"
+
+
+def get_unique_destination(destination: Path) -> Path:
     if not destination.exists():
         return destination
 
     counter = 1
     while True:
-        new_name = f"{destination.stem}_{counter}{destination.suffix}"
-        new_destination = destination.parent / new_name
+        new_destination = destination.parent / f"{destination.stem}_{counter}{destination.suffix}"
         if not new_destination.exists():
             return new_destination
         counter += 1
 
 
-for item in folder_path.iterdir():
-    if item.is_file():
-        file_extension = item.suffix.lower()
-        moved = False
+def collect_files(folder_path: Path):
+    files = []
 
-        for category, extensions in file_categories.items():
-            if file_extension in extensions:
-                destination = folder_path / category / item.name
-                destination = get_unique_destination(destination)
-                shutil.move(str(item), str(destination))
-                print(f"Moved {item.name} -> {category}")
-                moved = True
-                moved_count += 1
-                break
+    # Files in main folder
+    for item in folder_path.iterdir():
+        if item.is_file():
+            files.append(item)
 
-        if not moved:
-            destination = folder_path / "Others" / item.name
-            destination = get_unique_destination(destination)
-            shutil.move(str(item), str(destination))
-            print(f"Moved {item.name} -> Others")
+    # Files inside category folders only
+    for category in CATEGORY_NAMES:
+        category_folder = folder_path / category
+        if category_folder.exists() and category_folder.is_dir():
+            for item in category_folder.iterdir():
+                if item.is_file():
+                    files.append(item)
+
+    return files
+
+
+def organize_files(folder_path: Path, dry_run: bool = False) -> None:
+    create_category_folders(folder_path)
+
+    files = collect_files(folder_path)
+
+    moved_count = 0
+    correct_count = 0
+
+    for file_path in files:
+        if file_path.name == "organizer_log.txt":
+            continue
+
+        correct_category = get_file_category(file_path.name)
+        correct_folder = folder_path / correct_category
+
+        # already in correct folder
+        if file_path.parent.resolve() == correct_folder.resolve():
+            print(f"Already correct: {file_path.name} -> {correct_category}")
+            correct_count += 1
+            continue
+
+        destination = correct_folder / file_path.name
+        destination = get_unique_destination(destination)
+
+        if dry_run:
+            print(f"[DRY RUN] {file_path} -> {destination}")
+        else:
+            shutil.move(str(file_path), str(destination))
+            print(f"Moved: {file_path.name} -> {correct_category}")
             moved_count += 1
 
-print(f"\nTotal files moved: {moved_count}")
+    print("\n--- Summary ---")
+    print(f"Moved files: {moved_count}")
+    print(f"Already correct: {correct_count}")
+
+
+def main() -> None:
+    folder_input = input("Enter folder path to organize: ").strip()
+    folder_path = Path(folder_input)
+
+    if not folder_path.exists():
+        print("Error: folder does not exist.")
+        return
+
+    if not folder_path.is_dir():
+        print("Error: entered path is not a folder.")
+        return
+
+    dry_run_input = input("Run in dry mode? (yes/no): ").strip().lower()
+    dry_run = dry_run_input == "yes"
+
+    organize_files(folder_path, dry_run)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,23 @@
+
+--- Run started at 2026-03-21 22:08:24.976607 ---
+
+--- Run started at 2026-03-21 22:25:29.397870 ---
+Target folder: test_folder
+Dry run: False
+
+--- Run started at 2026-03-21 22:26:05.132793 ---
+Target folder: test_folder
+Dry run: False
+
+--- Run started at 2026-03-21 22:27:20.614503 ---
+Target folder: test_folder
+Dry run: False
+Moved notes.pdf -> PDFs
+
+--- Run started at 2026-03-21 22:35:33.213740 ---
+Target folder: test_folder
+Dry run: True
+
+--- Run started at 2026-03-21 22:35:57.401255 ---
+Target folder: test_folder
+Dry run: False

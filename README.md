@@ -1,40 +1,52 @@
-# Smart File Organizer
+# 🚀 Smart File Organizer
 
-A beginner-friendly Python automation project that organizes files into folders based on file type.
+A Python automation tool that organizes files into category-based folders and also fixes misplaced files automatically.
 
-## Features
-- Detects file types using extensions
-- Creates folders automatically
-- Moves files into the correct category
-- Sends unknown files to `Others`
-- Handles duplicate file names safely
+## ✨ Features
 
-## Tech Used
+- 📂 Organizes files by extension
+- 🔄 Detects and fixes wrongly placed files
+- 🧠 Smart categorization (Images, Videos, Docs, etc.)
+- ⚠️ Handles duplicate file names safely
+- 👀 Dry-run mode (preview changes before applying)
+- 📊 Summary of operations
+- 🛡️ Error handling for safe execution
+
+## 🛠️ Tech Stack
+
 - Python
 - pathlib
 - shutil
 
-## Categories
+## 📁 Categories
+
 - Images
 - PDFs
 - Videos
 - Documents
 - Audio
+- Archives
+- Code
+- Spreadsheets
 - Others
 
-## How to Run
-1. Open terminal in the project folder
-2. Run:
-   python main.py
-3. Enter the folder path you want to organize
+## ▶️ How to Run
 
-## Example
-Before:
-- photo.jpg
-- notes.pdf
-- song.mp3
+```bash
+python main.py
 
+##📸 Example
+
+ Before:
+test_folder/
+    photo.jpg
+    PDFs/
+        image.png
 After:
-- Images/photo.jpg
-- PDFs/notes.pdf
-- Audio/song.mp3
+test_folder/
+    Images/photo.jpg
+    Images/image.png 
+ 
+ 👨‍💻 Author
+
+Palak Barsaiyan
