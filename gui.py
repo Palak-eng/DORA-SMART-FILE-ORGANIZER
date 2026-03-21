@@ -2,8 +2,10 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from pathlib import Path
 from main import organize_files
+from PIL import Image
 import json
 import os
+import sys
 import threading
 import queue
 import io
@@ -14,6 +16,16 @@ ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
 SETTINGS_FILE = "settings.json"
+
+
+def resource_path(relative_path: str) -> str:
+    """Get absolute path to resource for dev and PyInstaller."""
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 
 THEMES = {
     "Cute": {
@@ -125,7 +137,7 @@ THEMES = {
 
 THEME_STYLES = {
     "Cute": {
-        "brand": "🎀 Smart File Organizer",
+        "brand": "DORA",
         "page_title": "Cute Dashboard",
         "subtitle": "Bows, blossoms, and beautifully sorted folders ✨",
         "hero": "🎀  🌸  🧁  ✨  🌷",
@@ -136,7 +148,7 @@ THEME_STYLES = {
         "welcome": "🎀 Welcome!\n\nChoose a folder and organize your files beautifully 🌸✨\n"
     },
     "Lavender": {
-        "brand": "💜 Smart File Organizer",
+        "brand": "DORA",
         "page_title": "Lavender Workspace",
         "subtitle": "Lavender calm with a dreamy, elegant workflow 🌿",
         "hero": "💜  🌿  🪻  ✨  🌙",
@@ -147,7 +159,7 @@ THEME_STYLES = {
         "welcome": "🪻 Welcome.\n\nA calm workspace for elegant file organization 🌿💜\n"
     },
     "Professional": {
-        "brand": "Smart File Organizer",
+        "brand": "DORA",
         "page_title": "Dashboard",
         "subtitle": "Professional organization workflow with clear operational control.",
         "hero": "▣   ◼   ▣   ◼   ▣",
@@ -158,7 +170,7 @@ THEME_STYLES = {
         "welcome": "System ready.\n\nSelect a target folder and execute the organization workflow.\n"
     },
     "Dark": {
-        "brand": "◈ Smart File Organizer",
+        "brand": "DORA",
         "page_title": "Control Center",
         "subtitle": "A sleek dark control panel for precise file operations.",
         "hero": "◢  ◆  ◣  ✦  ◆",
@@ -169,7 +181,7 @@ THEME_STYLES = {
         "welcome": "Dark interface online.\n\nPrecision mode enabled.\n"
     },
     "Light": {
-        "brand": "☁ Smart File Organizer",
+        "brand": "DORA",
         "page_title": "Workspace",
         "subtitle": "A fresh, airy workspace for clean file management.",
         "hero": "☁  ✨  ◦  ✦  ☼",
@@ -186,9 +198,16 @@ class SmartFileOrganizerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Smart File Organizer")
+        self.title("DORA")
         self.geometry("1320x840")
         self.minsize(1200, 760)
+
+        ico_path = resource_path("logo.ico")
+        if os.path.exists(ico_path):
+            try:
+                self.iconbitmap(ico_path)
+            except Exception:
+                pass
 
         self.folder_path_var = ctk.StringVar()
         self.dry_run_var = ctk.BooleanVar(value=True)
@@ -197,6 +216,19 @@ class SmartFileOrganizerApp(ctk.CTk):
         self.run_queue = queue.Queue()
         self.current_report = ""
         self.is_running = False
+
+        self.logo_image = None
+        png_path = resource_path("logo.png")
+        if os.path.exists(png_path):
+            try:
+                img = Image.open(png_path)
+                self.logo_image = ctk.CTkImage(
+                    light_image=img,
+                    dark_image=img,
+                    size=(48, 48)
+                )
+            except Exception:
+                self.logo_image = None
 
         self.load_settings()
         self.build_ui()
@@ -238,17 +270,27 @@ class SmartFileOrganizerApp(ctk.CTk):
         self.sidebar = ctk.CTkFrame(self, width=280, corner_radius=0)
         self.sidebar.pack(side="left", fill="y")
 
+        self.logo_frame = ctk.CTkFrame(self.sidebar, fg_color="transparent")
+        self.logo_frame.pack(anchor="w", padx=22, pady=(26, 8))
+
+        self.logo_icon = ctk.CTkLabel(
+            self.logo_frame,
+            image=self.logo_image,
+            text=""
+        )
+        self.logo_icon.pack(side="left", padx=(0, 10))
+
         self.logo_label = ctk.CTkLabel(
-            self.sidebar,
-            text="Smart File Organizer",
+            self.logo_frame,
+            text="DORA",
             font=("Arial", 28, "bold"),
             justify="left"
         )
-        self.logo_label.pack(anchor="w", padx=22, pady=(26, 8))
+        self.logo_label.pack(side="left")
 
         self.logo_subtitle = ctk.CTkLabel(
             self.sidebar,
-            text="Organize and correct file placement",
+            text="Digital Organizer & Routing Assistant",
             font=("Arial", 12),
             justify="left",
             wraplength=220
@@ -789,6 +831,13 @@ class SmartFileOrganizerApp(ctk.CTk):
             messagebox.showerror("Error", "Selected path is not a folder.")
             return
 
+        confirm = messagebox.askyesno(
+            "Confirm",
+            f"Do you want to organize this folder?\n\n{folder_path}"
+        )
+        if not confirm:
+            return
+
         dry_run = self.dry_run_var.get()
         self.save_settings()
 
@@ -818,7 +867,7 @@ class SmartFileOrganizerApp(ctk.CTk):
             captured_logs = buffer.getvalue()
 
             report_lines = [
-                "SMART FILE ORGANIZER REPORT",
+                "DORA REPORT",
                 "=" * 64,
                 "",
                 f"Folder Path    : {folder_path}",
