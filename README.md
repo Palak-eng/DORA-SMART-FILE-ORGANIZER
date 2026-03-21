@@ -14,3 +14,6 @@ DORA/
 │── logo.ico
 │── README.md
 │── .gitignore
+
+## 📸 Screenshots
+![Cute Theme](pinkmode.png)
