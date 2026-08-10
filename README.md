@@ -40,7 +40,7 @@ DORA performs the following steps:
 🛠️ Installation
 
 Clone the repository and install dependencies:
-git clone https://github.com/YOUR_USERNAME/DORA-file-organizer.git
+git clone https://github.com/Palak-eng/DORA-SMART-FILE-ORGANIZER.git
 cd DORA-file-organizer
 pip install customtkinter pillow
 
